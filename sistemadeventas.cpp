@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <limits> // Para numeric_limits
+
 using namespace std;
 
 struct producto {
@@ -18,7 +20,6 @@ int main() {
     int totalCompras = 0;
 
     do {
-        
         cout << "\nMenú de opciones\n";
         cout << "1. Agregar producto\n";
         cout << "2. Realizar compra\n";
@@ -31,31 +32,39 @@ int main() {
         cout << "Seleccione una opción: ";
         cin >> opcion;
 
+        if (cin.fail()) {
+            cin.clear(); 
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            cout << "Entrada no válida. Por favor, ingrese un número del menú.\n";
+            continue; 
+        }
+
         switch (opcion) {
             case 1:
                 if (totalProductos < 200) {
-                   
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
                     cout << "Ingrese el nombre del producto: ";
-                    cin >> inventario[totalProductos].nombre;
+                    getline(cin, inventario[totalProductos].nombre);
+
                     cout << "Ingrese el precio del producto: ";
                     cin >> inventario[totalProductos].precio;
+
                     cout << "Ingrese la cantidad del producto: ";
                     cin >> inventario[totalProductos].cantidad;
+
                     totalProductos++;
                 } else {
                     cout << "Inventario lleno. No se pueden agregar más productos." << endl;
                 }
                 break;
 
-            case 2:
+            case 2: {
                 if (totalProductos == 0) {
                     cout << "No hay productos disponibles en el inventario." << endl;
                     break;
                 }
 
-                
                 cout << "¿Qué producto desea comprar?" << endl;
-                cout << "Tenemos los siguientes productos:" << endl;
                 for (int i = 0; i < totalProductos; i++) {
                     cout << i + 1 << ". " << inventario[i].nombre
                          << " - Precio: " << inventario[i].precio
@@ -71,7 +80,7 @@ int main() {
                     break;
                 }
 
-                productoSeleccionado--; 
+                productoSeleccionado--;
                 int cantidadCompra;
                 cout << "Ingrese la cantidad que desea comprar: ";
                 cin >> cantidadCompra;
@@ -100,21 +109,19 @@ int main() {
 
                 inventario[productoSeleccionado].cantidad -= cantidadCompra;
 
-                
                 historialCompras[totalCompras] = "Producto: " + inventario[productoSeleccionado].nombre +
                                                  ", Cantidad: " + to_string(cantidadCompra) +
                                                  ", Total: $" + to_string(totalAPagar);
                 totalCompras++;
 
-                
                 totalVentas += totalAPagar;
                 break;
+            }
 
             case 3:
                 if (totalProductos == 0) {
                     cout << "El inventario está vacío." << endl;
                 } else {
-                    
                     cout << "Inventario actual:" << endl;
                     for (int i = 0; i < totalProductos; i++) {
                         cout << i + 1 << ". " << inventario[i].nombre
@@ -124,72 +131,71 @@ int main() {
                 }
                 break;
 
-            case 4:{
-           
-              string nombreBusqueda;
+            case 4: {
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                string nombreBusqueda;
                 cout << "Ingrese el nombre del producto que desea buscar: ";
-                cin >> nombreBusqueda;
-        
-                bool encontrado = false; 
-        
+                getline(cin, nombreBusqueda);
+
+                bool encontrado = false;
+
                 for (int i = 0; i < totalProductos; i++) {
                     if (inventario[i].nombre == nombreBusqueda) {
-                        cout << "Producto encontrado:" << endl;
-                        cout << "Nombre: " << inventario[i].nombre << endl;
-                        cout << "Precio: $" << inventario[i].precio << endl;
-                        cout << "Cantidad disponible: " << inventario[i].cantidad << endl;
+                        cout << "Producto encontrado:\n";
+                        cout << "Nombre: " << inventario[i].nombre << "\n";
+                        cout << "Precio: $" << inventario[i].precio << "\n";
+                        cout << "Cantidad disponible: " << inventario[i].cantidad << "\n";
                         encontrado = true;
-                        break; 
+                        break;
                     }
                 }
-        
+
                 if (!encontrado) {
                     cout << "Producto no encontrado en el inventario." << endl;
                 }
+                break;
             }
-            break;
-        
 
             case 5:
-    
-             cout << "\nReporte de Ventas\n";
-             cout << "Total de ventas: $" << totalVentas << endl;
+                cout << "\nReporte de Ventas\n";
+                cout << "Total de ventas: $" << totalVentas << endl;
+                break;
 
- 
-             if (totalProductos == 0) {
-             cout << "No hay productos en el inventario." << endl;
-             }   else {
-              cout << "\nVentas por producto:\n";
-              for (int i = 0; i < totalProductos; i++) {
-                int cantidadVendida= inventario[i].cantidad ;
-             
-             if (cantidadVendida < inventario[i].cantidad) {
-                int cantidadVendidaReal = inventario[i].cantidad - cantidadVendida;
-                float ventasPorProducto = cantidadVendidaReal * inventario[i].precio;
-                cout << "Producto: " << inventario[i].nombre
-                     << " | Cantidad Vendida: " << cantidadVendidaReal
-                     << " | Total generado: $" << ventasPorProducto << endl;
+            case 6: {
+                cout << "Inventario actual:" << endl;
+                for (int i = 0; i < totalProductos; i++) {
+                    cout << i + 1 << ". " << inventario[i].nombre
+                         << " - Precio: " << inventario[i].precio
+                         << " - Cantidad: " << inventario[i].cantidad << endl;
+                }
+
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Ingrese el nombre del producto cuyo precio desea actualizar: ";
+                string productoActualizar;
+                getline(cin, productoActualizar);
+
+                bool encontrado = false;
+                for (int i = 0; i < totalProductos; i++) {
+                    if (inventario[i].nombre == productoActualizar) {
+                        cout << "Ingrese el nuevo precio: ";
+                        cin >> inventario[i].precio;
+                        cout << "Precio actualizado con éxito." << endl;
+                        encontrado = true;
+                        break;
+                    }
+                }
+
+                if (!encontrado) {
+                    cout << "Producto no encontrado." << endl;
+                }
+                break;
             }
-        }
-    }
-
-    break;
-
-                
-               
-
-            case 6:
-
-            //cambio de precio
-                
-               
 
             case 7:
-              
                 if (totalCompras == 0) {
                     cout << "No hay compras registradas." << endl;
                 } else {
-                    cout << "Historial de compras:" << endl;
+                    cout << "Historial de compras:\n";
                     for (int i = 0; i < totalCompras; i++) {
                         cout << historialCompras[i] << endl;
                     }
@@ -202,6 +208,7 @@ int main() {
 
             default:
                 cout << "Opción inválida. Intente nuevamente." << endl;
+                break;
         }
 
     } while (opcion != 8);
